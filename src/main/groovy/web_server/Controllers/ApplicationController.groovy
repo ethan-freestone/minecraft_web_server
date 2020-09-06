@@ -9,8 +9,6 @@ import io.micronaut.http.annotation.Produces
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 
-import grails.gorm.transactions.Transactional
-
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,7 +36,6 @@ class ApplicationController {
 
     @Post('/start')
     @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
     HttpResponse<?> start() {
         Map response = [:]
         if (shellAccessService.process == null) {
