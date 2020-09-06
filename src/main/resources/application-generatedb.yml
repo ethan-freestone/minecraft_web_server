@@ -1,0 +1,7 @@
+hibernate:
+  hbm2ddl:
+    auto: create
+dataSource:
+  url: jdbc:h2:file:./generatedb
+  username: sa
+  password:

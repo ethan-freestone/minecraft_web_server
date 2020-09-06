@@ -1,0 +1,26 @@
+micronaut:
+  application:
+    name: web_server
+  server:
+    cors:
+        enabled: true
+        configurations:
+          web:
+            allowedOrigins:
+              - http://localhost:3000
+              - ^192\.168\.1\.[0-9]+:3000$
+  dataSource:
+    pooled: true
+    dbCreate: create-drop
+    url: jdbc:h2:file:./developmentdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  hibernate:
+    cache:
+      queries: false
+      use_second_level_cache: true
+      use_query_cache: false
+      region.factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+    hbm2ddl:
+     auto: validate

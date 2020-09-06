@@ -1,0 +1,86 @@
+plugins {
+    id 'groovy'
+    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'application'
+}
+
+version '0.1'
+group 'web_server'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+configurations {
+    // for dependencies that are needed for development only
+    developmentOnly
+}
+
+dependencies {
+    compileOnly(platform("io.micronaut:micronaut-bom:$micronautVersion"))
+    compileOnly('io.micronaut:micronaut-inject-groovy')
+    implementation(platform("io.micronaut:micronaut-bom:$micronautVersion"))
+    implementation('io.micronaut:micronaut-inject')
+    implementation('io.micronaut.groovy:micronaut-runtime-groovy')
+    implementation('javax.annotation:javax.annotation-api')
+    implementation('io.micronaut.groovy:micronaut-hibernate-gorm')
+    runtimeOnly('ch.qos.logback:logback-classic')
+    testImplementation(enforcedPlatform("io.micronaut:micronaut-bom:$micronautVersion"))
+    testImplementation('io.micronaut:micronaut-inject-groovy')
+    testImplementation('org.spockframework:spock-core') {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
+    testImplementation('io.micronaut.test:micronaut-test-spock')
+
+
+    runtime 'org.apache.tomcat:tomcat-jdbc:8.5.0'
+    runtime 'com.h2database:h2'
+    compile group: 'org.springframework', name: 'spring-web', version: '5.2.8.RELEASE'
+    compile group: 'io.micronaut.spring', name: 'micronaut-spring-boot-annotation', version: '1.0.0.M1'
+    compile group: 'io.micronaut', name: 'micronaut-http-client', version: '2.0.1'
+    runtime group: 'io.micronaut', name: 'micronaut-http-server-netty', version: '2.0.1'
+    compile group: 'io.micronaut', name: 'micronaut-validation', version: '2.0.1'
+    compile group: 'io.micronaut.configuration', name: 'micronaut-hibernate-gorm', version: '2.0.0.M3'
+    compile group: 'io.micronaut', name: 'micronaut-http', version: '2.0.1'
+
+}
+
+test.classpath += configurations.developmentOnly
+
+mainClassName = 'web_server.Application'
+
+// use JUnit 5 platform
+test {
+    useJUnitPlatform()
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion('11')
+    targetCompatibility = JavaVersion.toVersion('11')
+}
+
+tasks.withType(GroovyCompile) {
+    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
+}
+
+shadowJar {
+    mergeServiceFiles()
+}
+
+tasks.withType(JavaExec) {
+    classpath += configurations.developmentOnly
+    jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote')
+    if (gradle.startParameter.continuous) {
+        systemProperties(
+            'micronaut.io.watch.restart':'true',
+            'micronaut.io.watch.enabled':'true',
+            'micronaut.io.watch.paths':'src/main'
+        )
+    }
+}
+
+
+
