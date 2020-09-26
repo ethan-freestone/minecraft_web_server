@@ -31,10 +31,11 @@ function App() {
       <form onSubmit={(e) => {
         e.preventDefault()
         sendCommand(cmd)
+        setCmd('')
       }}
         autoComplete="off"
       >
-        <TextField id="cmd" label="Enter command" onChange={handleChange} variant="outlined" />
+        <TextField id="cmd" label="Enter command" onChange={handleChange} value={cmd} variant="outlined" />
       </form>
     </Card>
   );
