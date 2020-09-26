@@ -1,5 +1,8 @@
 import React, { useEffect, useState  } from 'react';
-import { getLog } from './requestFunctions'
+import { Card, List, ListItem, TextField } from '@material-ui/core';
+
+import { getLog, sendCommand } from './requestFunctions'
+
 function App() {
 
   const [log, setLog] = useState([]);
@@ -11,14 +14,29 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  console.log("LOGS:%o", log)
+  const [cmd, setCmd] = React.useState('');
+  const handleChange = (event) => {
+    setCmd(event.target.value);
+  };
+
+  //console.log("LOGS:%o", log)
 
   return (
-    <div>
-      {log.map(line =>
-          <p> {line} </p>
-      )}
-    </div>
+    <Card>
+      <List>
+        {log.map(line =>
+            <ListItem> {line} </ListItem>
+        )}
+      </List>
+      <form onSubmit={(e) => {
+        e.preventDefault()
+        sendCommand(cmd)
+      }}
+        autoComplete="off"
+      >
+        <TextField id="cmd" label="Enter command" onChange={handleChange} variant="outlined" />
+      </form>
+    </Card>
   );
 }
 

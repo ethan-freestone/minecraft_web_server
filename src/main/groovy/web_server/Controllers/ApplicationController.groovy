@@ -54,7 +54,7 @@ class ApplicationController {
 
     @Post('/command')
     @Produces(MediaType.APPLICATION_JSON)
-    HttpResponse<?> send(@Body Map commandMap) {
+    HttpResponse<?> command(@Body Map commandMap) {
         String cmd = commandMap.cmd
         shellAccessService.addToPostedCommands(cmd)
         return HttpResponse.ok()
