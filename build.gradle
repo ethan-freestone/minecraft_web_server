@@ -28,13 +28,14 @@ dependencies {
     implementation('javax.annotation:javax.annotation-api')
     implementation('io.micronaut.groovy:micronaut-hibernate-gorm')
     runtimeOnly('ch.qos.logback:logback-classic')
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.apache.tomcat:tomcat-jdbc")
     testImplementation(enforcedPlatform("io.micronaut:micronaut-bom:$micronautVersion"))
     testImplementation('io.micronaut:micronaut-inject-groovy')
     testImplementation('org.spockframework:spock-core') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
     testImplementation('io.micronaut.test:micronaut-test-spock')
-
 
     compile group: 'io.micronaut.spring', name: 'micronaut-spring-boot-annotation', version: '1.0.0.M1'
     compile group: 'io.micronaut', name: 'micronaut-http-client', version: '2.0.1'
@@ -54,8 +55,8 @@ test {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion('11')
-    targetCompatibility = JavaVersion.toVersion('11')
+    sourceCompatibility = JavaVersion.toVersion('14')
+    targetCompatibility = JavaVersion.toVersion('14')
 }
 
 tasks.withType(GroovyCompile) {
