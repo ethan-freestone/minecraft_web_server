@@ -27,6 +27,7 @@ dependencies {
     implementation('io.micronaut.groovy:micronaut-runtime-groovy')
     implementation('javax.annotation:javax.annotation-api')
     implementation('io.micronaut.groovy:micronaut-hibernate-gorm')
+
     runtimeOnly('ch.qos.logback:logback-classic')
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.apache.tomcat:tomcat-jdbc")

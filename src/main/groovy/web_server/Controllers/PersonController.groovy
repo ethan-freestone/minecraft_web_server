@@ -1,7 +1,6 @@
 package web_server.controllers
 
 import web_server.domain.Person
-import web_server.services.PersonService
 
 import groovy.transform.CompileStatic
 import io.micronaut.http.annotation.Controller
@@ -12,22 +11,33 @@ import io.micronaut.http.annotation.Produces
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 
-import org.springframework.validation.*
-import javax.inject.*
+import grails.gorm.transactions.Transactional
 
-@CompileStatic
 @Controller("/person")
 class PersonController {
 
-    @Inject PersonService personService
-
+    @Transactional
     @Post("/save")
-    HttpResponse<Map> savePerson(@Body Person person) {
+    HttpResponse<Person> savePerson(@Body Person person) {
         try {
-            return HttpResponse.ok( [ person: personService.save(person) ] as Map )
+            person.save()
+            return HttpResponse.ok( person )
         }
         catch(Exception e) {
-           println("Whoops")
+           println("Whoops ${e.message}")
         }
     }
+
+    @Transactional
+    @Get("/")
+    HttpResponse<List> getPeople() {
+        try {
+            List<Person> pList = Person.findAll()
+            return HttpResponse.ok( pList )
+        }
+        catch(Exception e) {
+           println("Whoops ${e.message}")
+        }
+    }
+
 }
