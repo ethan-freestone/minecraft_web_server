@@ -14,30 +14,6 @@ import io.micronaut.http.MediaType
 import grails.gorm.transactions.Transactional
 
 @Controller("/person")
-class PersonController {
-
-    @Transactional
-    @Post("/save")
-    HttpResponse<Person> savePerson(@Body Person person) {
-        try {
-            person.save()
-            return HttpResponse.ok( person )
-        }
-        catch(Exception e) {
-           println("Whoops ${e.message}")
-        }
-    }
-
-    @Transactional
-    @Get("/")
-    HttpResponse<List> getPeople() {
-        try {
-            List<Person> pList = Person.findAll()
-            return HttpResponse.ok( pList )
-        }
-        catch(Exception e) {
-           println("Whoops ${e.message}")
-        }
-    }
+class PersonController extends GORMController<Person> {
 
 }
