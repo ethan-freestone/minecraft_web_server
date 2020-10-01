@@ -45,9 +45,6 @@ class GORMController<T> {
         @Nullable @QueryValue('sort') String sort = 'id',
         @Nullable @QueryValue('order') String order = 'asc'
     ) {
-        println("MAX: ${max}")
-        println("SORT: ${sort}")
-        println("ORDER: ${order}")
         try {
             List<T> rList = max ? type.list(max: max, sort: sort, order: order) : type.list()
             return HttpResponse.ok( rList )

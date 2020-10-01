@@ -5,7 +5,9 @@ micronaut:
     cors:
         enabled: true
 dataSource:
-  url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+  #Uncomment for persistent db
+  url: jdbc:h2:mem:devDb
+  #url: jdbc:h2:file:d:\files\minecraft\minecraft_web_server\devDB;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
   driverClassName: org.h2.Driver
   username: sa
   password: ''
