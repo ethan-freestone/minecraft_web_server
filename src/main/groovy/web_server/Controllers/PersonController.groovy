@@ -1,10 +1,10 @@
 package web_server.controllers
 
 import web_server.domain.Person
-import groovy.transform.CompileStatic
+import groovy.transform.CompileDynamic
 import io.micronaut.http.annotation.Controller
 
-@CompileStatic
+@CompileDynamic
 @Controller('/person')
 class PersonController extends GORMController<Person> {
     PersonController() {

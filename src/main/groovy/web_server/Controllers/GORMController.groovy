@@ -22,16 +22,32 @@ import grails.gorm.transactions.Transactional
 class GORMController<T> {
 
     final Class<T> type;
+    final ArrayList<String> persistentProperties;
+
     GORMController(Class<T> type) {
         this.type = type
+        // Grab list of non-inherited persistent properties for Class<T>
+        this.persistentProperties = type.gormPersistentEntity.persistentProperties.findAll {
+            it.isInherited() == false
+        }.collect {
+            it.name
+        }
     }
 
     @Transactional
     @Post('/')
-    HttpResponse<T> saveResource(@Body T resource) {
+    HttpResponse<T> saveResource(@Body Map resource) {
         try {
-            resource.save()
-            return HttpResponse.ok( resource )
+
+            Class<T> dbResource = type.newInstance(resource)
+            dbResource.validate()
+            if (dbResource.hasErrors()) {
+                println("ERRORS: ${dbResource.errors}")
+                return HttpResponse.unprocessableEntity( )
+            }
+
+            dbResource.save()
+            return HttpResponse.ok( dbResource )
         }
         catch(Exception e) {
            println("Whoops ${e.message}")
@@ -46,7 +62,11 @@ class GORMController<T> {
         @Nullable @QueryValue('order') String order = 'asc'
     ) {
         try {
-            List<T> rList = max ? type.list(max: max, sort: sort, order: order) : type.list()
+            List<T> rList = type.list(
+                max: max ?: null,
+                sort: sort ?: null,
+                order: order ?: null
+            )
             return HttpResponse.ok( rList )
         }
         catch(Exception e) {
@@ -71,11 +91,10 @@ class GORMController<T> {
     HttpResponse<T> updateResource(@PathVariable String id, @Body Map resource) {
         try {
             T dbResource = type.findById(id)
-            resource.each { key, value ->
-                // Go property by property, except for the id
-                // TODO there's probably a better/safer way to do this
-                if (key != 'id') {
-                    dbResource[key] = value
+            // For each of the persistent properties, check incoming Map and bind to correct field
+            persistentProperties.each {
+                if(resource[it]) {
+                    dbResource[it] = resource[it]
                 }
             }
             dbResource.save()

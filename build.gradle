@@ -36,6 +36,7 @@ dependencies {
     testImplementation('org.spockframework:spock-core') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
+    
     testImplementation('io.micronaut.test:micronaut-test-spock')
 
     compile group: 'io.micronaut.spring', name: 'micronaut-spring-boot-annotation', version: '1.0.0.M1'

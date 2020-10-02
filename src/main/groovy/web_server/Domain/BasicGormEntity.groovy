@@ -8,9 +8,14 @@ import com.fasterxml.jackson.annotation.JsonFormat
 @Entity
 class BasicGormEntity {
 
+    String id
+
     @JsonFormat(locale='DEFAULT_LOCALE')
     Date dateCreated
     @JsonFormat(locale='DEFAULT_LOCALE')
     Date lastUpdated
 
+    static mapping = {
+        id generator: 'uuid'
+    }
 }
