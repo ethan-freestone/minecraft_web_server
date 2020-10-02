@@ -36,18 +36,16 @@ class GORMController<T> {
 
     @Transactional
     @Post('/')
-    HttpResponse<T> saveResource(@Body Map resource) {
+    HttpResponse<T> saveResource(@Body T resource) {
         try {
-
-            Class<T> dbResource = type.newInstance(resource)
-            dbResource.validate()
-            if (dbResource.hasErrors()) {
-                println("ERRORS: ${dbResource.errors}")
-                return HttpResponse.unprocessableEntity( )
+            resource.validate()
+            if (resource.hasErrors()) {
+                println("ERRORS: ${resource.errors}")
+                return HttpResponse.unprocessableEntity( resource )
             }
 
-            dbResource.save()
-            return HttpResponse.ok( dbResource )
+            resource.save()
+            return HttpResponse.ok( resource )
         }
         catch(Exception e) {
            println("Whoops ${e.message}")
