@@ -3,7 +3,7 @@ micronaut:
     name: web_server
   server:
     cors:
-        enabled: true
+      enabled: true
 dataSource:
   #Uncomment for persistent db
   url: jdbc:h2:mem:devDb
