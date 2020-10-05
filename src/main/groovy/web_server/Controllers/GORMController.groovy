@@ -4,6 +4,10 @@ import groovy.transform.CompileDynamic
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Body
 
+import javax.validation.Valid
+import org.springframework.validation.FieldError
+import org.grails.datastore.mapping.validation.ValidationException
+
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
@@ -36,14 +40,8 @@ class GORMController<T> {
 
     @Transactional
     @Post('/')
-    HttpResponse<T> saveResource(@Body T resource) {
+    HttpResponse<T> saveResource(@Body @Valid T resource) {
         try {
-            resource.validate()
-            if (resource.hasErrors()) {
-                println("ERRORS: ${resource.errors}")
-                return HttpResponse.unprocessableEntity( resource )
-            }
-
             resource.save()
             return HttpResponse.ok( resource )
         }
@@ -87,8 +85,9 @@ class GORMController<T> {
     @Transactional
     @Put('/{id}')
     HttpResponse<T> updateResource(@PathVariable String id, @Body Map resource) {
+        T dbResource
         try {
-            T dbResource = type.findById(id)
+            dbResource = type.findById(id)
             // For each of the persistent properties, check incoming Map and bind to correct field
             persistentProperties.each {
                 if(resource[it]) {
@@ -97,8 +96,21 @@ class GORMController<T> {
             }
             dbResource.save()
             return HttpResponse.ok( dbResource )
-        }
-        catch(Exception e) {
+        } catch (ValidationException e) {
+            return HttpResponse.unprocessableEntity().body(
+                [
+                    person: dbResource,
+                    errors: e.errors.allErrors.collect {
+                        FieldError err = it as FieldError
+                        [
+                            field: err.field,
+                            rejectedValue: err.rejectedValue,
+                            message: err.defaultMessage
+                        ]
+                    }
+                ]
+            ) as HttpResponse<Map>
+        } catch(Exception e) {
            println("Whoops ${e.message}")
         }
     }

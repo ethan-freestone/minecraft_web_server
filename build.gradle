@@ -21,12 +21,15 @@ configurations {
 
 dependencies {
     compileOnly(platform("io.micronaut:micronaut-bom:$micronautVersion"))
-    compileOnly('io.micronaut:micronaut-inject-groovy')
+    runtime "io.micronaut:micronaut-core:$micronautVersion"
+    compileOnly("io.micronaut:micronaut-inject-groovy:$micronautVersion")
+
     implementation(platform("io.micronaut:micronaut-bom:$micronautVersion"))
     implementation('io.micronaut:micronaut-inject')
     implementation('io.micronaut.groovy:micronaut-runtime-groovy')
+
     implementation('javax.annotation:javax.annotation-api')
-    implementation('io.micronaut.groovy:micronaut-hibernate-gorm')
+    implementation("io.micronaut.groovy:micronaut-hibernate-gorm")
 
     runtimeOnly('ch.qos.logback:logback-classic')
     runtimeOnly("com.h2database:h2")
@@ -36,17 +39,17 @@ dependencies {
     testImplementation('org.spockframework:spock-core') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
-    
+
     testImplementation('io.micronaut.test:micronaut-test-spock')
 
-    compile group: 'io.micronaut.spring', name: 'micronaut-spring-boot-annotation', version: '1.0.0.M1'
-    compile group: 'io.micronaut', name: 'micronaut-http-client', version: '2.0.1'
-    runtime group: 'io.micronaut', name: 'micronaut-http-server-netty', version: '2.0.1'
-    compile group: 'io.micronaut', name: 'micronaut-validation', version: '2.0.1'
-    compile group: 'io.micronaut', name: 'micronaut-http', version: '2.0.1'
+    //compile group: 'io.micronaut.spring', name: 'micronaut-spring-boot-annotation', version: '2.1.1'
+    compile group: 'io.micronaut', name: 'micronaut-http-client', version: "$micronautVersion"
+    runtime group: 'io.micronaut', name: 'micronaut-http-server-netty', version: "$micronautVersion"
+    compile group: 'io.micronaut', name: 'micronaut-http', version: "$micronautVersion"
 
+    // Validation
+    compile "io.micronaut:micronaut-validation:$micronautVersion"
 }
-
 test.classpath += configurations.developmentOnly
 
 mainClassName = 'web_server.Application'
@@ -57,8 +60,8 @@ test {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion('14')
-    targetCompatibility = JavaVersion.toVersion('14')
+    sourceCompatibility = JavaVersion.toVersion('11')
+    targetCompatibility = JavaVersion.toVersion('11')
 }
 
 tasks.withType(GroovyCompile) {
