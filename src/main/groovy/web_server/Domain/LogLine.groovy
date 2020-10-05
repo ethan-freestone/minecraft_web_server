@@ -8,12 +8,11 @@ import javax.validation.constraints.*
 @CompileDynamic
 @Introspected
 @Entity
-class Person extends BasicGormEntity {
+class LogLine extends BasicGormEntity {
     @NotBlank
-    String name
-
-    @Max(100L)
-    @Min(0L)
-    Integer age
-    String desc
+    String serverTimeStamp
+    @NotBlank
+    String context
+    @NotBlank
+    String Output
 }
