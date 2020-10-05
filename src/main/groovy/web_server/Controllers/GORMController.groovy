@@ -8,6 +8,7 @@ import javax.validation.Valid
 import org.springframework.validation.FieldError
 import org.grails.datastore.mapping.validation.ValidationException
 
+
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
@@ -70,11 +71,11 @@ class GORMController<T> {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly=true)
     @Get('/{id}')
     HttpResponse<T> getResource(@PathVariable String id) {
         try {
-            T resource = type.findById(id)
+            T resource = type.get(id)
             return HttpResponse.ok( resource )
         }
         catch(Exception e) {
@@ -87,7 +88,7 @@ class GORMController<T> {
     HttpResponse<T> updateResource(@PathVariable String id, @Body Map resource) {
         T dbResource
         try {
-            dbResource = type.findById(id)
+            dbResource = type.get(id)
             // For each of the persistent properties, check incoming Map and bind to correct field
             persistentProperties.each {
                 if(resource[it]) {
@@ -100,8 +101,7 @@ class GORMController<T> {
             return HttpResponse.unprocessableEntity().body(
                 [
                     person: dbResource,
-                    errors: e.errors.allErrors.collect {
-                        FieldError err = it as FieldError
+                    errors: e.errors.allErrors.collect { FieldError err ->
                         [
                             field: err.field,
                             rejectedValue: err.rejectedValue,
@@ -115,20 +115,29 @@ class GORMController<T> {
         }
     }
 
-    // Bulk endpoints
     @Transactional
-    @Post('/bulk')
-    HttpResponse<T> saveResources(@Body List<T> resources) {
+    @Delete('/{id}')
+    HttpResponse deleteResource(@PathVariable String id) {
         try {
-            List<T> returnList = []
-            resources.each { T resource ->
-                resource.save()
-                returnList.add(resource)
-            }
-            return HttpResponse.ok( returnList )
-        }
-        catch(Exception e) {
+            T dbResource = type.get(id)
+            dbResource.delete()
+            return HttpResponse.ok( )
+        } catch(Exception e) {
            println("Whoops ${e.message}")
         }
+    }
+
+    // Bulk endpoints
+    @Transactional(rollbackFor=Exception.class)
+    @Post('/bulk')
+    HttpResponse<T> saveResources(@Body @Valid List<T> resources) {
+        // Here we just throw an exception if any of the resources aren't valid,
+        // so as to invoke the rollback and prevent the rest of the data from saving
+        List<T> returnList = []
+        resources.each { T resource ->
+            resource.save()
+            returnList.add(resource)
+        }
+        return HttpResponse.ok( returnList )
     }
 }

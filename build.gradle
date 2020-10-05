@@ -42,7 +42,6 @@ dependencies {
 
     testImplementation('io.micronaut.test:micronaut-test-spock')
 
-    //compile group: 'io.micronaut.spring', name: 'micronaut-spring-boot-annotation', version: '2.1.1'
     compile group: 'io.micronaut', name: 'micronaut-http-client', version: "$micronautVersion"
     runtime group: 'io.micronaut', name: 'micronaut-http-server-netty', version: "$micronautVersion"
     compile group: 'io.micronaut', name: 'micronaut-http', version: "$micronautVersion"
