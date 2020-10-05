@@ -1,15 +1,25 @@
 /* groovylint-disable UnnecessaryGetter */
 package web_server.services
 
+import web_server.domain.LogLine
+
+import grails.gorm.transactions.TransactionService
+
 import groovy.transform.CompileStatic
 import javax.inject.Singleton
+import javax.inject.Inject
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 
+import java.util.regex.*
+
 @Singleton
 @CompileStatic
 class ShellAccessService {
+
+    
+    @Inject TransactionService transactionService;
 
     Process process = null
     // SERVER OUTPUT
@@ -70,6 +80,28 @@ class ShellAccessService {
                 BufferedWriter consoleFileBW = new BufferedWriter(consoleWriter)
                 consoleFileBW.write("$line \n")
                 consoleFileBW.flush()
+
+                try {
+                    transactionService.withTransaction {
+                        // Save log line
+                        Pattern p = Pattern.compile('(\\[(.*?)\\]) (\\[(.*?)\\]): (.*)')
+                        Matcher m = p.matcher(line)
+                        m.matches()
+                        String timestamp = m.group(2)
+                        String context = m.group(4)
+                        String rest = m.group(5)
+
+                        LogLine ll = new LogLine(
+                            serverTimeStamp: timestamp,
+                            context: context,
+                            output: rest
+                        )
+                        ll.save()
+                    }
+                } catch (Exception e) {
+                    println("Whoops saving log line: ${e.message}")
+                }
+
             }
         }
     }

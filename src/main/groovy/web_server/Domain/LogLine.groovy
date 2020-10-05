@@ -14,5 +14,5 @@ class LogLine extends BasicGormEntity {
     @NotBlank
     String context
     @NotBlank
-    String Output
+    String output
 }
