@@ -56,7 +56,7 @@ class GORMController<T> {
     HttpResponse<List> getResources(
         @Nullable @QueryValue('max') Integer max,
         @Nullable @QueryValue('sort') String sort = 'id',
-        @Nullable @QueryValue('order') String order = 'asc',
+        @Nullable @QueryValue('order') String order = 'asc'
     ) {
 
         // TODO implement FILTERS or PARAMS block to search on a particular prop
