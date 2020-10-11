@@ -14,7 +14,7 @@ function Console({ logs, onSend }) {
                 {logs.map(function(line, index) {
                     console.log("INDEX: %o", index)
                     return (
-                    <li className={index % 2 == 0 ? "even" : "odd"}>
+                    <li className={index % 2 === 0 ? "even" : "odd"}>
                         {line.output}
                     </li>
                     );
