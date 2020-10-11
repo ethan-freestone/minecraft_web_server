@@ -12,3 +12,4 @@ out/
 .settings
 .classpath
 console.txt
+frontend/yarn.lock

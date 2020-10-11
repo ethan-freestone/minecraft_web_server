@@ -21,11 +21,17 @@ class ApplicationController {
     @Inject
     ShellAccessService shellAccessService
 
+    @Get('/')
+    @Produces(MediaType.APPLICATION_JSON)
+    HttpResponse<Boolean> isAlive() {
+        return HttpResponse.ok(shellAccessService.isAlive())
+    }
+
     @Post('/start')
     @Produces(MediaType.APPLICATION_JSON)
     HttpResponse<?> start() {
         Map response = [:]
-        if (shellAccessService.process == null) {
+        if (shellAccessService.process == null || shellAccessService.isAlive() == false) {
             shellAccessService.startShell()
 
             shellAccessService.processReader()

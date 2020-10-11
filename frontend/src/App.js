@@ -1,21 +1,25 @@
 import React, { useEffect, useState  } from 'react';
 
-import { getLog, sendCommand } from './requestFunctions'
-import Console from './Components/Console/Console' 
+import { getAlive, getLog, sendCommand, serverOn } from './requestFunctions';
+import Console from './Components/Console/Console';
+
 
 function App() {
 
   const [log, setLog] = useState([]);
-  // Fetch logs every half second
+  const [alive, setAlive] = useState(false);
+
+  // Fetch logs/alive-state every half second
   useEffect(() => {
     const interval = setInterval(() => {
       getLog(setLog)
+      getAlive(setAlive)
     }, 500);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <Console onSend={sendCommand} logs={log}/>
+    <Console {... {alive, onSend: sendCommand, logs: log, serverOn }}/>
   );
 }
 

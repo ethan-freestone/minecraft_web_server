@@ -93,4 +93,11 @@ class ShellAccessService {
             }
         }
     }
+
+    boolean isAlive() {
+        if (process != null) {
+            return process.isAlive()
+        }
+        return false
+    }
 }
