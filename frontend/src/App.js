@@ -19,13 +19,11 @@ function App() {
     setCmd(event.target.value);
   };
 
-  //console.log("LOGS:%o", log)
-
   return (
     <Card>
       <List>
         {log.map(line =>
-            <ListItem> {line} </ListItem>
+            <ListItem> {line.output} </ListItem>
         )}
       </List>
       <form onSubmit={(e) => {

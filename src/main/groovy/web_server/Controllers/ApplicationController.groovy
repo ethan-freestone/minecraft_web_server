@@ -21,25 +21,11 @@ class ApplicationController {
     @Inject
     ShellAccessService shellAccessService
 
-    @Get('/')
-    @Produces(MediaType.APPLICATION_JSON)
-    HttpResponse<?> index() {
-        Map response = [:]
-        if (shellAccessService.process != null) {
-            response['log'] = shellAccessService.readConsoleFile()
-            return HttpResponse.ok(response)
-        } else {
-            response['error'] = "Server not running"
-            return HttpResponse.serverError()
-        }
-    }
-
     @Post('/start')
     @Produces(MediaType.APPLICATION_JSON)
     HttpResponse<?> start() {
         Map response = [:]
         if (shellAccessService.process == null) {
-            shellAccessService.setupConsoleFile()
             shellAccessService.startShell()
 
             shellAccessService.processReader()
