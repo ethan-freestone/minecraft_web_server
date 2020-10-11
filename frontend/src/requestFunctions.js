@@ -15,8 +15,24 @@ export function getLog(setLog) {
     });
 }
 
+export function getAlive(setAlive) {
+    // creates entity
+    fetch("http://localhost:8080/shell", {
+        method: "GET",
+    })
+    .then(response =>
+        response.json()
+    )
+    .then(status => {
+        setAlive(status)
+        return status
+    })
+    .catch(err => {
+        console.log(err);
+    });
+}
+
 export function sendCommand(e) {
-    console.log("COMMAND TO SEND: %o", e)
     // creates entity
     fetch("http://Atlas:8080/shell/command", {
         method: "POST",
