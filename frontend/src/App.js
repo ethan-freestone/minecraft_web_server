@@ -1,7 +1,7 @@
 import React, { useEffect, useState  } from 'react';
-import { Card, List, ListItem, TextField } from '@material-ui/core';
 
 import { getLog, sendCommand } from './requestFunctions'
+import Console from './Components/Console/Console' 
 
 function App() {
 
@@ -14,28 +14,8 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const [cmd, setCmd] = React.useState('');
-  const handleChange = (event) => {
-    setCmd(event.target.value);
-  };
-
   return (
-    <Card>
-      <List>
-        {log.map(line =>
-            <ListItem> {line.output} </ListItem>
-        )}
-      </List>
-      <form onSubmit={(e) => {
-        e.preventDefault()
-        sendCommand(cmd)
-        setCmd('')
-      }}
-        autoComplete="off"
-      >
-        <TextField id="cmd" label="Enter command" onChange={handleChange} value={cmd} variant="outlined" />
-      </form>
-    </Card>
+    <Console onSend={sendCommand} logs={log}/>
   );
 }
 
