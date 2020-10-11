@@ -1,13 +1,13 @@
 export function getLog(setLog) {
     // creates entity
-    fetch("http://Atlas:8080/shell", {
-        "method": "GET"
+    fetch("http://localhost:8080/logs?sort=dateCreated&max=20&order=desc", {
+        method: "GET",
     })
     .then(response =>
         response.json()
     )
     .then(data => {
-        setLog(data.log ? data.log : [])
+        setLog(data ? data.reverse() : [])
         return data
     })
     .catch(err => {

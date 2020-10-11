@@ -18,20 +18,15 @@ import java.util.regex.*
 @CompileStatic
 class ShellAccessService {
 
-    
     @Inject TransactionService transactionService;
 
     Process process = null
     // SERVER OUTPUT
     BufferedReader br
-    File consoleFile
 
     //SERVER INPUT
     StringBuffer postedCommands = new StringBuffer();
     BufferedWriter bw
-
-    //FILE READER
-    BufferedReader fbr
 
     // Threads
     Thread processReadingThread
@@ -54,33 +49,14 @@ class ShellAccessService {
         bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))
     }
 
-    void setupConsoleFile() {
-        consoleFile = new File('console.txt')
-            if (consoleFile.createNewFile()) {
-                println("File created: " + consoleFile.getName() + consoleFile.getPath())
-            } else {
-                println("File already exists.")
-            }
-        fbr = new BufferedReader(new FileReader(consoleFile))
-    }
-
-    List<String> readConsoleFile() {
-        return Files.readAllLines(Paths.get(consoleFile.getPath()))
-    }
-
     void addToPostedCommands(String text) {
         postedCommands.append(text)
     }
 
     void processReader() {
         processReadingThread = Thread.start {
-            FileWriter consoleWriter = new FileWriter(consoleFile)
             String line = null
             while ((line = br.readLine()) != null) {
-                BufferedWriter consoleFileBW = new BufferedWriter(consoleWriter)
-                consoleFileBW.write("$line \n")
-                consoleFileBW.flush()
-
                 try {
                     transactionService.withTransaction {
                         // Save log line
@@ -101,7 +77,6 @@ class ShellAccessService {
                 } catch (Exception e) {
                     println("Whoops saving log line: ${e.message}")
                 }
-
             }
         }
     }
