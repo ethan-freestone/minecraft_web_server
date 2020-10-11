@@ -50,7 +50,22 @@ export function sendCommand(e) {
     .catch(err => {
         console.log(err);
     });
-    
-    
 }
 
+
+export function serverOn() {
+    // creates entity
+    fetch("http://Atlas:8080/shell/start", {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response =>
+        response.json()
+    )
+    .catch(err => {
+        console.log(err);
+    });
+}

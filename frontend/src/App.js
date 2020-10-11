@@ -1,8 +1,6 @@
 import React, { useEffect, useState  } from 'react';
-import Switch from "react-switch";
-import { Col, Row } from 'react-flexbox-grid';
 
-import { getAlive, getLog, sendCommand } from './requestFunctions';
+import { getAlive, getLog, sendCommand, serverOn } from './requestFunctions';
 import Console from './Components/Console/Console';
 
 
@@ -21,15 +19,7 @@ function App() {
   }, []);
 
   return (
-    <Row>
-      <Col xs={6}>
-        <Console onSend={sendCommand} logs={log}/>
-      </Col>
-      <Col>
-        <Switch checked={alive}/>
-      </Col>
-    </Row>
-    
+    <Console {... {alive, onSend: sendCommand, logs: log, serverOn }}/>
   );
 }
 
