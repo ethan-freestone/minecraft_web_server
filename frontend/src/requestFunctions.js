@@ -7,7 +7,7 @@ export function getLog(setLog, max = null) {
         response.json()
     )
     .then(data => {
-        setLog(data ? data : [])
+        setLog(data ? data.reverse() : [])
         return data
     })
     .catch(err => {
@@ -26,6 +26,23 @@ export function getAlive(setAlive) {
     .then(status => {
         setAlive(status)
         return status
+    })
+    .catch(err => {
+        console.log(err);
+    });
+}
+
+export function getLogCount(setCount) {
+    // creates entity
+    fetch("http://localhost:8080/logs/count", {
+        method: "GET",
+    })
+    .then(response =>
+        response.json()
+    )
+    .then(count => {
+        setCount(count)
+        return count
     })
     .catch(err => {
         console.log(err);

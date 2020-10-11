@@ -34,11 +34,4 @@
 .scrollContainer {
     height: 300px;
     overflow: auto;
-    display: flex;
-    flex-direction: column-reverse;
-}
-
-.scroller {
-    display: flex;
-    flex-direction: column-reverse;
 }
