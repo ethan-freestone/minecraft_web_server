@@ -8,18 +8,26 @@ function App() {
 
   const [log, setLog] = useState([]);
   const [alive, setAlive] = useState(false);
+  const [max, setMax] = useState(20);
 
   // Fetch logs/alive-state every half second
   useEffect(() => {
+    console.log("max: %o", max)
     const interval = setInterval(() => {
-      getLog(setLog)
+      getLog(setLog, max)
       getAlive(setAlive)
     }, 500);
     return () => clearInterval(interval);
-  }, []);
+  }, [max]);
 
   return (
-    <Console {... {alive, onSend: sendCommand, logs: log, serverOn }}/>
+    <Console {... {
+      alive,
+      onSend: sendCommand,
+      logs: log,
+      serverOn,
+      setMax
+    }}/>
   );
 }
 

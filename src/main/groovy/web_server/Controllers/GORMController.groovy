@@ -73,6 +73,18 @@ class GORMController<T> {
         }
     }
 
+    @Transactional
+    @Get('/count')
+    HttpResponse<List> getResourceCount() {
+        try {
+            int rCount = type.count()
+            return HttpResponse.ok( rCount )
+        }
+        catch(Exception e) {
+           println("Whoops ${e.message}")
+        }
+    }
+
     @Transactional(readOnly=true)
     @Get('/{id}')
     HttpResponse<T> getResource(@PathVariable String id) {

@@ -1,13 +1,13 @@
-export function getLog(setLog) {
+export function getLog(setLog, max = null) {
     // creates entity
-    fetch("http://localhost:8080/logs?sort=dateCreated&max=20&order=desc", {
+    fetch(`http://localhost:8080/logs?sort=dateCreated${max ? `&max=${max}` : ''}&order=desc`, {
         method: "GET",
     })
     .then(response =>
         response.json()
     )
     .then(data => {
-        setLog(data ? data.reverse() : [])
+        setLog(data ? data : [])
         return data
     })
     .catch(err => {

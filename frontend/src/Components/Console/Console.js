@@ -2,10 +2,17 @@ import React, { useEffect, useState } from 'react';
 
 import Switch from "react-switch";
 import { Col, Row } from 'react-flexbox-grid';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 import './Console.css';
 
-function Console({ alive, logs, onSend, serverOn }) {
+function Console({
+    alive,
+    onSend,
+    logs,
+    serverOn,
+    setMax
+  }) {
     const [cmd, setCmd] = useState('');
     const [offPending, setOffPending] = useState(false)
 
@@ -46,15 +53,29 @@ function Console({ alive, logs, onSend, serverOn }) {
     return (
         <div className="box">
             {consoleHeader()}
-            <ul className="list">
-                {logs.map(function(line, index) {
-                    return (
-                    <li className={index % 2 === 0 ? "even" : "odd"}>
-                        {line.output}
-                    </li>
-                    );
-                })}
-            </ul>
+            <div
+                className="scrollContainer"
+                id="scrollableDiv"
+            >
+                <InfiniteScroll
+                    className="scroller"
+                    dataLength={logs.length}
+                    next={setMax(logs.length + 10)}
+                    inverse={true}
+                    hasMore={true}
+                    loader={<p>Loading...</p>}
+                    scrollableTarget="scrollableDiv"
+                >
+                    {logs.map(function(line, index) {
+                            return (
+                                <div className={index % 2 === 0 ? "even" : "odd"}>
+                                    {line.output}
+                                </div>
+                            );
+                        })
+                    }
+                </InfiniteScroll>
+            </div>
             <form onSubmit={(e) => {
                 e.preventDefault()
                 onSend(cmd)
