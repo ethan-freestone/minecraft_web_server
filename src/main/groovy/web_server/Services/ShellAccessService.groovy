@@ -47,7 +47,7 @@ class ShellAccessService {
                     }
                 }
             } catch (Exception e) {
-                println("Error in ShellAccessService constructor: ${e.message}")
+                println("Error in ShellAccessService startshell: ${e.message}")
             }
         }
 
