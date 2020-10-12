@@ -31,6 +31,7 @@ class ShellAccessService {
     // Threads
     Thread processReadingThread
     Thread processWritingThread
+    File serverDir = new File('d:\\Files\\Minecraft\\1.16.2 Server')
 
     void startShell() {
         ProcessBuilder pb = new ProcessBuilder(
@@ -41,7 +42,7 @@ class ShellAccessService {
             "server.jar",
             "nogui"
         )
-        pb.directory(new File('d:\\Files\\Minecraft\\1.16.2 Server'))
+        pb.directory(serverDir)
         pb.redirectErrorStream(true)
         process = pb.start()
          // Set up the reader/writer
