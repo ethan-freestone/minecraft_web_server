@@ -34,20 +34,23 @@ class ShellAccessService {
     Thread processWritingThread
     File serverDir
 
-    ShellAccessService(TransactionService transactionService) {
-        // We inject the transaction service into the constructor
-        // so that we can use a transaction to define the serverDir file
-        try {
-            transactionService.withTransaction {
-                ServerConfig path = ServerConfig.findByName("path")
-                serverDir = new File(path.settingString)
-            }
-        } catch (Exception e) {
-            println("Error in ShellAccessService constructor: ${e.message}")
-        }
-    }
-
     void startShell() {
+        // Before doing anything, load in path config if not found
+        if (!serverDir) {
+            try {
+                transactionService.withTransaction {
+                    ServerConfig path = ServerConfig.findByName("path")
+                    if (path) {
+                        serverDir = new File(path.settingString)
+                    } else {
+                        throw Exception("\"path\" server config not found")
+                    }
+                }
+            } catch (Exception e) {
+                println("Error in ShellAccessService constructor: ${e.message}")
+            }
+        }
+
         ProcessBuilder pb = new ProcessBuilder(
             "java",
             "-Xmx3072M",
