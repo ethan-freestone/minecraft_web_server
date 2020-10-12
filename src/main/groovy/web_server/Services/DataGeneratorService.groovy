@@ -19,4 +19,5 @@ class DataGeneratorService {
          * can also have this check a GORM "block" entity count. If 0, can attempt to load from
          * generated file
          */
+    }
 }
