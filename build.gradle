@@ -48,6 +48,10 @@ dependencies {
 
     // Validation
     compile "io.micronaut:micronaut-validation:$micronautVersion"
+
+    // Discovery + event handling
+    compile 'io.micronaut:micronaut-discovery-client:2.0.1'
+
 }
 test.classpath += configurations.developmentOnly
 
