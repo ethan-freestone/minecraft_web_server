@@ -22,7 +22,6 @@ class BootstrappingService {
 
     @EventListener
     public void loadConfig(final ServiceReadyEvent event) {
-        println("SERVER STARTED, READY TO BOOTSTRAP")
         try {
             transactionService.withTransaction {
                 ServerConfig path = new ServerConfig(

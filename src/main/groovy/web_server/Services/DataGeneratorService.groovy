@@ -15,6 +15,8 @@ class DataGeneratorService {
     @Async
     public void runDataGenerator(final BootstrapCompleteEvent event) {
         println("Bootstrapping complete, runDataGenerator method called")
-    }
-
+        /* TODO check for generator folder on path, if none exists run the data generator ASYNC
+         * can also have this check a GORM "block" entity count. If 0, can attempt to load from
+         * generated file
+         */
 }
