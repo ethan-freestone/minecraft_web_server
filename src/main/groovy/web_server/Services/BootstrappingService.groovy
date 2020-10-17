@@ -33,10 +33,9 @@ class BootstrappingService {
                 )
                 path.save()
             }
-
-            eventPublisher.publishEvent(new BootstrapCompleteEvent())
         } catch (Exception e) {
             println("Whoops: ${e.message}")
         }
+        eventPublisher.publishEvent(new BootstrapCompleteEvent())
     }
 }

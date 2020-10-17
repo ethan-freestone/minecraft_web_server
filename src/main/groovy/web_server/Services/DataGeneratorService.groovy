@@ -14,7 +14,14 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+
+import java.io.*
+import java.nio.charset.StandardCharsets
+
 import web_server.domain.ServerConfig
+import web_server.domain.MinecraftItem
 import web_server.events.BootstrapCompleteEvent
 import web_server.events.DataGenerationCompleteEvent
 
@@ -79,23 +86,122 @@ class DataGeneratorService {
         Process p = pb.start()
         p.waitFor()
         println('Data generation process complete')
+
         eventPublisher.publishEvent(new DataGenerationCompleteEvent())
     }
 
-
-
     @EventListener
     @Async
-    void blockIngester(final DataGenerationCompleteEvent event) {
-        println('dataGen finished--ingest blocks')
-        int blockCount = 0
-
+    void itemIngester(final DataGenerationCompleteEvent event) {
+        int itemCount = 0
         try {
             transactionService.withTransaction {
-                println("INGEST BLOCKS HERE")
+               itemCount = MinecraftItem.count()
             }
         } catch (Exception e) {
             println("Whoops: ${e.message}")
+        }
+
+        if (itemCount == 0) {
+            println('ingesting items')
+            try {
+                String jsonFilePath = "${path}${separator}generated${separator}reports${separator}registries.json"
+                JsonReader jsonReader = new JsonReader(
+                    new InputStreamReader(
+                        new FileInputStream(jsonFilePath),
+                        StandardCharsets.UTF_8
+                    )
+                )
+                readJsonFile(jsonReader)
+            } catch (Exception e) {
+                println("Whoops: ${e.message}")
+            }
+        } else {
+            println('Minecraft items already ingested')
+        }
+    }
+
+    String minecraftNameToDisplayName(String mcName) {
+        String output = mcName.replace("minecraft:", "").replace("_", " ")
+        return toDisplayCase(output)
+    }
+
+    String toDisplayCase(String s) {
+        final String ACTIONABLE_DELIMITERS = " '-/"; // these cause the character following
+                                                    // to be capitalized
+        StringBuilder sb = new StringBuilder();
+        boolean capNext = true;
+
+        for (char c : s.toCharArray()) {
+            c = (capNext)
+                    ? Character.toUpperCase(c)
+                    : Character.toLowerCase(c);
+            sb.append(c);
+            capNext = (ACTIONABLE_DELIMITERS.indexOf((int) c) >= 0); // explicit cast not needed
+        }
+        return sb.toString();
+    }
+
+    // Read in JSON file line by line
+    void readJsonFile(JsonReader jsonReader) {
+        // Store level in JSON object, so we know when we're at the top route
+        // TOP ROUTE IS LEVEL 1
+        int level = 0;
+
+        while(jsonReader.peek() != JsonToken.END_DOCUMENT) {
+            JsonToken jsonToken = jsonReader.peek();
+
+            switch (jsonToken) {
+                case JsonToken.BEGIN_ARRAY:
+                    level++
+                    jsonReader.beginArray()
+                    break;
+                case JsonToken.END_ARRAY:
+                    level--
+                    jsonReader.endArray()
+                    break;
+                case JsonToken.BEGIN_OBJECT:
+                    level++
+                    jsonReader.beginObject()
+                    break;
+                case JsonToken.END_OBJECT:
+                    level--
+                    jsonReader.endObject()
+                    break;
+                case JsonToken.NAME:
+                    // Skip all top level registries except minecraft:item
+                    switch (level) {
+                        case 1:
+                            // We're at the top level, check if right object
+                            if (jsonReader.nextName() != "minecraft:item") {
+                                jsonReader.skipValue()
+                            }
+                            break;
+                        case 3:
+                            // This is now the name of a minecraft item
+                            String name = jsonReader.nextName()
+                            try {
+                                transactionService.withTransaction {
+                                    MinecraftItem mi = new MinecraftItem(
+                                        [
+                                            name: name,
+                                            displayName: minecraftNameToDisplayName(name)
+                                        ]
+                                    )
+                                    mi.save()
+                                }
+                            } catch (Exception e) {
+                                println("Failure importing item: ${name}")
+                            }
+                        default:
+                            jsonReader.skipValue()
+                            break;
+                    }
+                    break;
+                default:
+                    jsonReader.skipValue()
+                    break;
+            }
         }
     }
 }

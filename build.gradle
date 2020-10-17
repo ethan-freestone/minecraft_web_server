@@ -52,6 +52,8 @@ dependencies {
     // Discovery + event handling
     compile 'io.micronaut:micronaut-discovery-client:2.0.1'
 
+    // GSON
+    compile 'com.google.code.gson:gson:2.8.6'
 }
 test.classpath += configurations.developmentOnly
 
