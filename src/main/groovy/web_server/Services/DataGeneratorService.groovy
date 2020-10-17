@@ -103,7 +103,7 @@ class DataGeneratorService {
         }
 
         if (itemCount == 0) {
-            println('ingesting items')
+            println('Ingesting items')
             try {
                 String jsonFilePath = "${path}${separator}generated${separator}reports${separator}registries.json"
                 JsonReader jsonReader = new JsonReader(
