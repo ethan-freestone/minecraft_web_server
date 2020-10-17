@@ -13,3 +13,4 @@ out/
 .classpath
 console.txt
 frontend/yarn.lock
+frontend/debug.log
