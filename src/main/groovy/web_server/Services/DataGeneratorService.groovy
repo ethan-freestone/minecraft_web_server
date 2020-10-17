@@ -25,12 +25,13 @@ class DataGeneratorService {
     //Inject necessary services for GORM manipulation and event publishing
     @Inject TransactionService transactionService
     @Inject ApplicationEventPublisher eventPublisher
+    String path
+    String separator = File.separator
+    File serverDir
 
     @EventListener
     @Async
     void dataGeneratorManagement(final BootstrapCompleteEvent event) {
-        String path
-        String separator = File.separator
 
         try {
             transactionService.withTransaction {
@@ -55,9 +56,9 @@ class DataGeneratorService {
                 eventPublisher.publishEvent(new DataGenerationCompleteEvent())
             } else {
                 // Data generator not run yet
-                File serverDir = new File(path)
+                serverDir = new File(path)
                 println('Data generation has not been run--running data generation')
-                runDataGenerator(serverDir)
+                runDataGenerator()
             }
         } else {
             println('Whoops: No path exists')
@@ -65,7 +66,7 @@ class DataGeneratorService {
     }
 
     @Async
-    void runDataGenerator(File serverDir) {
+    void runDataGenerator() {
         ProcessBuilder pb = new ProcessBuilder(
             'java',
             '-cp',
@@ -79,5 +80,22 @@ class DataGeneratorService {
         p.waitFor()
         println('Data generation process complete')
         eventPublisher.publishEvent(new DataGenerationCompleteEvent())
+    }
+
+
+
+    @EventListener
+    @Async
+    void blockIngester(final DataGenerationCompleteEvent event) {
+        println('dataGen finished--ingest blocks')
+        int blockCount = 0
+
+        try {
+            transactionService.withTransaction {
+                println("INGEST BLOCKS HERE")
+            }
+        } catch (Exception e) {
+            println("Whoops: ${e.message}")
+        }
     }
 }
