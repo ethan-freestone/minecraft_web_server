@@ -86,3 +86,20 @@ export function serverOn() {
         console.log(err);
     });
 }
+
+export function getItems(setItems) {
+    // creates entity
+    fetch(`http://Atlas:8080/minecraftItem?max=10`, {
+        method: "GET",
+    })
+    .then(response =>
+        response.json()
+    )
+    .then(data => {
+        setItems(data ? data : [])
+        return data
+    })
+    .catch(err => {
+        console.log(err);
+    });
+}
