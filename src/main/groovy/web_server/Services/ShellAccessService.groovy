@@ -2,23 +2,21 @@
 package web_server.services
 
 import web_server.domain.LogLine
+import web_server.domain.ServerConfig
 
 import grails.gorm.transactions.TransactionService
 
-import groovy.transform.CompileStatic
+import groovy.transform.CompileDynamic
 import javax.inject.Singleton
 import javax.inject.Inject
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.concurrent.TimeUnit
 
 import java.util.regex.*
 
 @Singleton
-@CompileStatic
+@CompileDynamic
 class ShellAccessService {
 
-    @Inject TransactionService transactionService;
+    @Inject TransactionService transactionService
 
     Process process = null
     // SERVER OUTPUT
@@ -31,8 +29,25 @@ class ShellAccessService {
     // Threads
     Thread processReadingThread
     Thread processWritingThread
+    File serverDir
 
     void startShell() {
+        // Before doing anything, load in path config if not found
+        if (!serverDir) {
+            try {
+                transactionService.withTransaction {
+                    ServerConfig path = ServerConfig.findByName("path")
+                    if (path) {
+                        serverDir = new File(path.settingString)
+                    } else {
+                        throw Exception("\"path\" server config not found")
+                    }
+                }
+            } catch (Exception e) {
+                println("Error in ShellAccessService startshell: ${e.message}")
+            }
+        }
+
         ProcessBuilder pb = new ProcessBuilder(
             "java",
             "-Xmx3072M",
@@ -41,7 +56,7 @@ class ShellAccessService {
             "server.jar",
             "nogui"
         )
-        pb.directory(new File('d:\\Files\\Minecraft\\1.16.2 Server'))
+        pb.directory(serverDir)
         pb.redirectErrorStream(true)
         process = pb.start()
          // Set up the reader/writer
