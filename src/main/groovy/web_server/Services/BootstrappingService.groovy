@@ -17,6 +17,7 @@ import web_server.events.BootstrapCompleteEvent
 @CompileStatic
 class BootstrappingService {
 
+    //Inject necessary services for GORM manipulation and event publishing
     @Inject TransactionService transactionService
     @Inject ApplicationEventPublisher eventPublisher
 
