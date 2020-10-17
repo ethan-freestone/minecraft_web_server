@@ -1,6 +1,6 @@
 export function getLog(setLog, max = null) {
     // creates entity
-    fetch(`http://localhost:8080/logs?sort=dateCreated${max ? `&max=${max}` : ''}&order=desc`, {
+    fetch(`http://Atlas:8080/logs?sort=dateCreated${max ? `&max=${max}` : ''}&order=desc`, {
         method: "GET",
     })
     .then(response =>
@@ -17,7 +17,7 @@ export function getLog(setLog, max = null) {
 
 export function getAlive(setAlive) {
     // creates entity
-    fetch("http://localhost:8080/shell", {
+    fetch("http://Atlas:8080/shell", {
         method: "GET",
     })
     .then(response =>
@@ -34,7 +34,7 @@ export function getAlive(setAlive) {
 
 export function getLogCount(setCount) {
     // creates entity
-    fetch("http://localhost:8080/logs/count", {
+    fetch("http://Atlas:8080/logs/count", {
         method: "GET",
     })
     .then(response =>
