@@ -10,7 +10,6 @@ export function get(path, params = null) {
         response.json()
     )
     .then(data => {
-        //console.log("Returning: %o", data, "for path: ", path)
         return data
     })
     .catch(err => {
@@ -36,7 +35,6 @@ export function post(path, postBody) {
         response.json()
     )
     .then(data => {
-        //console.log("Returning (post): %o", data, "for path: ", path)
         return data
     })
     .catch(err => {
