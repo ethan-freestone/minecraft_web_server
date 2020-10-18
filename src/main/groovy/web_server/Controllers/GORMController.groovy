@@ -8,7 +8,6 @@ import javax.validation.Valid
 import org.springframework.validation.FieldError
 import org.grails.datastore.mapping.validation.ValidationException
 
-
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
@@ -19,12 +18,14 @@ import io.micronaut.http.annotation.QueryValue
 import javax.annotation.Nullable
 
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.MediaType
 
 import grails.gorm.transactions.Transactional
+import grails.gorm.DetachedCriteria
 
 @CompileDynamic
 class GORMController<T> {
+
+    private static final String REGEX_OP = "^(.*?)([=!]~|=i=|([!=<>]{1,2}))(.*?)\$"
 
     final Class<T> type;
     final ArrayList<String> persistentProperties;
@@ -54,18 +55,27 @@ class GORMController<T> {
     @Transactional
     @Get('/')
     HttpResponse<List> getResources(
+        @Nullable @QueryValue('filters') List<String> filterStrings,
         @Nullable @QueryValue('max') Integer max,
         @Nullable @QueryValue('sort') String sort = 'id',
         @Nullable @QueryValue('order') String order = 'asc'
     ) {
-
-        // TODO implement FILTERS or PARAMS block to search on a particular prop
         try {
-            List<T> rList = type.list(
-                max: max ?: null,
-                sort: sort ?: null,
-                order: order ?: null
-            )
+            List<T> rList
+            if (filterStrings) {
+                DetachedCriteria criteria = queryBuilder(filterStrings)
+                rList = criteria.list(
+                    max: max ?: null,
+                    sort: sort ?: null,
+                    order: order ?: null
+                )
+            } else {
+                rList = type.list(
+                    max: max ?: null,
+                    sort: sort ?: null,
+                    order: order ?: null
+                )
+            }
             return HttpResponse.ok( rList )
         }
         catch(Exception e) {
@@ -153,5 +163,65 @@ class GORMController<T> {
             returnList.add(resource)
         }
         return HttpResponse.ok( returnList )
+    }
+
+    DetachedCriteria queryBuilder(List<String> filterStrings) {
+        DetachedCriteria criteria = new DetachedCriteria(type)
+
+        filterStrings.each { filterString ->
+            def matches = filterString =~  REGEX_OP
+
+            if (matches.size() == 1) {
+                def match = matches[0]
+                def prop = match[1].trim()
+                def propMatch = match[4]
+
+                if (propMatch.class.simpleName == "String") {
+                    propMatch = propMatch.trim()
+                }
+
+                switch(match[2]) {
+                    case '=' :
+                    case '==' :
+                        criteria = criteria.build {
+                            eq prop, propMatch
+                        }
+                        break
+                    case '!=' :
+                        criteria = criteria.build {
+                            ne prop, propMatch
+                        }
+                        break
+                    case '>' :
+                        criteria = criteria.build {
+                            gt prop, propMatch
+                        }
+                        break
+                    case '>=' :
+                        criteria = criteria.build {
+                            ge prop, propMatch
+                        }
+                        break
+                    case '<' :
+                        criteria = criteria.build {
+                            lt prop, propMatch
+                        }
+                        break
+                    case '<=' :
+                        criteria = criteria.build {
+                            le prop, propMatch
+                        }
+                        break
+                    case '=i=' :
+                        criteria = criteria.build {
+                            ilike prop, "%${propMatch}%"
+                        }
+                        break
+                    default : 
+                    log.debug "Unknown comparator '${match[2]}' ignoring expression."
+                }
+            }
+        }
+        return criteria
     }
 }

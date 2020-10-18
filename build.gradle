@@ -29,7 +29,6 @@ dependencies {
     implementation('io.micronaut.groovy:micronaut-runtime-groovy')
 
     implementation('javax.annotation:javax.annotation-api')
-    implementation("io.micronaut.groovy:micronaut-hibernate-gorm")
 
     runtimeOnly('ch.qos.logback:logback-classic')
     runtimeOnly("com.h2database:h2")
@@ -45,6 +44,10 @@ dependencies {
     compile group: 'io.micronaut', name: 'micronaut-http-client', version: "$micronautVersion"
     runtime group: 'io.micronaut', name: 'micronaut-http-server-netty', version: "$micronautVersion"
     compile group: 'io.micronaut', name: 'micronaut-http', version: "$micronautVersion"
+
+    // Gorm
+    implementation("io.micronaut.groovy:micronaut-hibernate-gorm")
+    compile "org.grails:grails-datastore-gorm-hibernate5"
 
     // Validation
     compile "io.micronaut:micronaut-validation:$micronautVersion"
