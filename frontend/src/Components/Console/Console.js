@@ -4,16 +4,48 @@ import Switch from "react-switch";
 import { Col, Row } from 'react-flexbox-grid';
 import InfiniteScroll from 'react-infinite-scroller';
 
+import { get, getCount, post } from '../gormControllerRequestFunctions';
+
 import './Console.css';
 
-function Console({
-    alive,
-    onSend,
-    logs,
-    logCount,
-    serverOn,
-    setMax
-  }) {
+function Console() {
+
+    const onSend = (cmd) => post('shell/command', {cmd: cmd})
+    const serverOn = () => post('shell/start', {})
+
+    const [logs, setLogs] = useState([]);
+    const [logCount, setLogCount] = useState(0);
+    const [alive, setAlive] = useState(false);
+    const [max, setMax] = useState(20);
+
+    // Fetch logs/alive-state every half second
+    useEffect(() => {
+        const interval = setInterval(() => {
+        const logPromise = get(
+            'logs',
+            {
+            sort: 'dateCreated',
+            max: max,
+            order: 'desc'
+            }
+        )
+        logPromise.then(response => {
+            setLogs(response ? response.reverse() : [])
+        })
+
+        const logCountPromise = getCount('logs')
+        logCountPromise.then(response => {
+            setLogCount(response)
+        })
+
+        const alivePromise = get('shell')
+        alivePromise.then(response => {
+            setAlive(response)
+        })
+        }, 500);
+        return () => clearInterval(interval);
+    }, [max]);
+
     const [cmd, setCmd] = useState('');
     const [offPending, setOffPending] = useState(false)
 
@@ -57,8 +89,6 @@ function Console({
         );
     }
     
-    //console.log("CMD: %o", cmd)
-
     return (
         <div className="box">
             {consoleHeader()}
